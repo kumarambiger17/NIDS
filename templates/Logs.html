@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Logs - AI NIDS</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #06121f;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 255px;
+            height: 100vh;
+            background: #071522;
+            border-right: 1px solid #17344a;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 1000;
+        }
+
+        .logo {
+            height: 124px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            border-bottom: 1px solid #17344a;
+        }
+
+        .logo span {
+            color: #00d4ff;
+            margin-right: 8px;
+        }
+
+        /* SYSTEM STATUS */
+
+        .system-status {
+            margin: 18px;
+            padding: 15px;
+            border: 1px solid #19425c;
+            border-radius: 10px;
+            background: #0b2030;
+        }
+
+        .system-title {
+            color: #00ff88;
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        .system-text {
+            color: #54809a;
+            font-size: 12px;
+        }
+
+        /* NAVIGATION */
+
+        .nav {
+            padding: 10px 12px;
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 48px;
+            padding: 0 18px;
+            margin: 5px 0;
+            border-radius: 9px;
+            text-decoration: none;
+            color: #d6e4ed;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .nav a:hover {
+            background: #102c40;
+            color: #ffffff;
+        }
+
+        .nav a.active {
+            background: linear-gradient(90deg, #00c9ef, #04aaca);
+            color: #00131c;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
+        }
+
+        .nav-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* USER AREA */
+
+        .user-area {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            min-height: 60px;
+            padding: 12px 18px;
+            border-top: 1px solid #17344a;
+            background: #071522;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #00c9ef;
+            color: #00131c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: #62879c;
+            margin-top: 3px;
+        }
+
+        /* ================= MAIN CONTENT ================= */
+
+        .main {
+            margin-left: 255px;
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        /* HEADER */
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-title {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .page-subtitle {
+            margin-top: 7px;
+            color: #62879c;
+            font-size: 14px;
+        }
+
+        .live-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border: 1px solid #075f43;
+            border-radius: 20px;
+            background: #06291f;
+            color: #00ff88;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+        }
+
+        /* ================= SUMMARY CARDS ================= */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: #0b1d2d;
+            border: 1px solid #183b53;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .summary-label {
+            color: #668da4;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .summary-value {
+            margin-top: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .summary-card.safe .summary-value {
+            color: #00ff88;
+        }
+
+        .summary-card.alert .summary-value {
+            color: #ffc400;
+        }
+
+        .summary-card.threat .summary-value {
+            color: #ff4058;
+        }
+
+        /* ================= LOG PANEL ================= */
+
+        .log-panel {
+            background: #091b2a;
+            border: 1px solid #183b53;
+            border-radius: 13px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid #183b53;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .panel-description {
+            color: #62879c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* ================= FILTERS ================= */
+
+        .filters {
+            padding: 15px 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #183b53;
+            background: #081724;
+        }
+
+        .filters input,
+        .filters select {
+            background: #0d2435;
+            border: 1px solid #21465d;
+            color: #ffffff;
+            border-radius: 7px;
+            padding: 10px 12px;
+            outline: none;
+        }
+
+        .filters input {
+            width: 240px;
+        }
+
+        .filters input:focus,
+        .filters select:focus {
+            border-color: #00d4ff;
+        }
+
+        .clear-btn {
+            background: #00c9ef;
+            border: none;
+            color: #00131c;
+            padding: 10px 18px;
+            border-radius: 7px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .clear-btn:hover {
+            background: #00aacc;
+        }
+
+        /* ================= TABLE ================= */
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background: #00c9ef;
+            color: #00131c;
+            padding: 14px;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #17344a;
+            color: #d8e6ee;
+            font-size: 13px;
+        }
+
+        tr:hover td {
+            background: #0d2638;
+        }
+
+        .protocol {
+            font-weight: bold;
+        }
+
+        .tcp {
+            color: #00d4ff;
+        }
+
+        .udp {
+            color: #b78cff;
+        }
+
+        .other {
+            color: #a9b8c1;
+        }
+
+        /* STATUS */
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .safe {
+            color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.25);
+        }
+
+        .alert {
+            color: #ffc400;
+            background: rgba(255, 196, 0, 0.1);
+            border: 1px solid rgba(255, 196, 0, 0.25);
+        }
+
+        .threat {
+            color: #ff4058;
+            background: rgba(255, 64, 88, 0.1);
+            border: 1px solid rgba(255, 64, 88, 0.25);
+        }
+
+        .prediction {
+            font-weight: bold;
+        }
+
+        .attack {
+            color: #ff4058;
+        }
+
+        .suspicious {
+            color: #ffc400;
+        }
+
+        .benign {
+            color: #00ff88;
+        }
+
+        /* EMPTY */
+
+        .empty {
+            padding: 50px;
+            text-align: center;
+            color: #668da4;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media(max-width: 1100px) {
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media(max-width: 750px) {
+
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+                margin-left: 210px;
+                padding: 20px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <div class="page-header">
+
+            <div>
+                <div class="page-title">
+                    Security Logs
+                </div>
+
+                <div class="page-subtitle">
+                    Network activity and security event history
+                </div>
+            </div>
+
+            <div class="live-status">
+                <span class="live-dot"></span>
+                LIVE MONITORING
+            </div>
+
+        </div>
+
+
+        <!-- ================= SUMMARY ================= -->
+
+        <div class="summary-grid">
+
+            <div class="summary-card">
+
+                <div class="summary-label">
+                    Total Events
+                </div>
+
+                <div class="summary-value">
+                    {{ packets|length if packets is defined else 0 }}
+                </div>
+
+            </div>
+
+
+            <div class="summary-card safe">
+
+                <div class="summary-label">
+                    Safe Events
+                </div>
+
+                <div class="summary-value">
+                    {{ packets|selectattr('status','equalto','SAFE')|list|length if packets is defined else 0 }}
+                </div>
+
+            </div>
+
+
+            <div class="summary-card alert">
+
+                <div class="summary-label">
+                    Alerts
+                </div>
+
+                <div class="summary-value">
+                    {{ packets|selectattr('status','equalto','ALERT')|list|length if packets is defined else 0 }}
+                </div>
+
+            </div>
+
+
+            <div class="summary-card threat">
+
+                <div class="summary-label">
+                    Threats
+                </div>
+
+                <div class="summary-value">
+                    {{ packets|selectattr('status','equalto','THREAT')|list|length if packets is defined else 0 }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= LOG PANEL ================= -->
+
+        <section class="log-panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <div class="panel-title">
+                        Network Event Logs
+                    </div>
+
+                    <div class="panel-description">
+                        Real-time packet monitoring and security classification
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- FILTERS -->
+
+            <div class="filters">
+
+                <input type="text" id="searchInput" placeholder="🔍 Search IP address..." onkeyup="filterLogs()">
+
+                <select id="statusFilter" onchange="filterLogs()">
+
+                    <option value="ALL">
+                        All Status
+                    </option>
+
+                    <option value="SAFE">
+                        Safe
+                    </option>
+
+                    <option value="ALERT">
+                        Alert
+                    </option>
+
+                    <option value="THREAT">
+                        Threat
+                    </option>
+
+                </select>
+
+
+                <select id="protocolFilter" onchange="filterLogs()">
+
+                    <option value="ALL">
+                        All Protocols
+                    </option>
+
+                    <option value="TCP">
+                        TCP
+                    </option>
+
+                    <option value="UDP">
+                        UDP
+                    </option>
+
+                    <option value="OTHER">
+                        Other
+                    </option>
+
+                </select>
+
+                <button class="clear-btn" onclick="clearFilters()">
+                    Clear Filters
+                </button>
+
+            </div>
+
+
+            <!-- TABLE -->
+
+            <div class="table-container">
+
+                <table id="logsTable">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                Source IP
+                            </th>
+
+                            <th>
+                                Destination IP
+                            </th>
+
+                            <th>
+                                Protocol
+                            </th>
+
+                            <th>
+                                Packet Length
+                            </th>
+
+                            <th>
+                                Prediction
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Risk Score
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% if packets is defined and packets %}
+
+                        {% for packet in packets|reverse %}
+
+                        <tr>
+
+                            <td>
+                                {{ loop.index }}
+                            </td>
+
+                            <td>
+                                {{ packet.get('src', '-') }}
+                            </td>
+
+                            <td>
+                                {{ packet.get('dst', '-') }}
+                            </td>
+
+                            <td>
+
+                                {% set protocol = packet.get('protocol','OTHER') %}
+
+                                <span class="protocol
+                                    {% if protocol == 'TCP' %}
+                                        tcp
+                                    {% elif protocol == 'UDP' %}
+                                        udp
+                                    {% else %}
+                                        other
+                                    {% endif %}
+                                ">
+
+                                    {{ protocol }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+                                {{ packet.get('length', 0) }} bytes
+                            </td>
+
+                            <td>
+
+                                {% set prediction = packet.get('prediction','BENIGN') %}
+
+                                <span class="prediction
+                                    {% if prediction == 'ATTACK' %}
+                                        attack
+                                    {% elif prediction == 'SUSPICIOUS' %}
+                                        suspicious
+                                    {% else %}
+                                        benign
+                                    {% endif %}
+                                ">
+
+                                    {{ prediction }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                {% set status = packet.get('status','SAFE') %}
+
+                                <span class="status
+                                    {% if status == 'THREAT' %}
+                                        threat
+                                    {% elif status == 'ALERT' %}
+                                        alert
+                                    {% else %}
+                                        safe
+                                    {% endif %}
+                                ">
+
+                                    {{ status }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                {{ packet.get('risk_score', 0) }}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                        {% else %}
+
+                        <tr>
+
+                            <td colspan="8">
+
+                                <div class="empty">
+
+                                    📭 No network logs available.
+
+                                    <br><br>
+
+                                    Start Live Capture to begin monitoring network traffic.
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endif %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        function filterLogs() {
+
+            const search =
+                document.getElementById("searchInput")
+                    .value
+                    .toLowerCase();
+
+            const status =
+                document.getElementById("statusFilter")
+                    .value;
+
+            const protocol =
+                document.getElementById("protocolFilter")
+                    .value;
+
+            const rows =
+                document.querySelectorAll("#logsTable tbody tr");
+
+            rows.forEach(row => {
+
+                const text =
+                    row.innerText.toLowerCase();
+
+                const rowStatus =
+                    row.children[6]
+                        ? row.children[6].innerText.trim().toUpperCase()
+                        : "";
+
+                const rowProtocol =
+                    row.children[3]
+                        ? row.children[3].innerText.trim().toUpperCase()
+                        : "";
+
+                const matchesSearch =
+                    text.includes(search);
+
+                const matchesStatus =
+                    status === "ALL" ||
+                    rowStatus === status;
+
+                const matchesProtocol =
+                    protocol === "ALL" ||
+                    rowProtocol === protocol;
+
+                if (
+                    matchesSearch &&
+                    matchesStatus &&
+                    matchesProtocol
+                ) {
+
+                    row.style.display = "";
+
+                } else {
+
+                    row.style.display = "none";
+
+                }
+
+            });
+
+        }
+
+
+        function clearFilters() {
+
+            document.getElementById("searchInput").value = "";
+
+            document.getElementById("statusFilter").value = "ALL";
+
+            document.getElementById("protocolFilter").value = "ALL";
+
+            filterLogs();
+
+        }
+
+    </script>
+
+</body>
+
+</html>

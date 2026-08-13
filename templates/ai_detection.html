@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Detection - NIDS</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+        }
+
+        .page {
+            display: flex;
+            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #020617;
+            padding: 24px 18px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: bold;
+            color: #38bdf8;
+            margin-bottom: 24px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #e2e8f0;
+            text-decoration: none;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .sidebar a.active,
+        .sidebar a:hover {
+            background: #38bdf8;
+            color: #082f49;
+        }
+
+        .content {
+            flex: 1;
+            margin-left: 255px;
+            padding: 24px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1d4ed8, #0f766e);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #111827;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .card h3 {
+            color: #38bdf8;
+            margin: 0 0 8px;
+            font-size: 15px;
+        }
+
+        .card .value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #111827;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+        }
+
+        th {
+            background: #0f172a;
+            color: #38bdf8;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .safe {
+            background: #14532d;
+            color: #dcfce7;
+        }
+
+        .alert {
+            background: #92400e;
+            color: #fef3c7;
+        }
+
+        .threat {
+            background: #7f1d1d;
+            color: #fee2e2;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        {% include 'sidebar.html' %}
+
+        <main class="content">
+            <section class="hero">
+                <h1>AI Detection Center</h1>
+                <p>Real-time packet inspection with lightweight risk scoring for suspicious traffic.</p>
+            </section>
+
+            <section class="stats">
+                <div class="card">
+                    <h3>Total packets</h3>
+                    <div class="value" id="totalPackets">0</div>
+                </div>
+                <div class="card">
+                    <h3>Safe</h3>
+                    <div class="value" id="safeCount">0</div>
+                </div>
+                <div class="card">
+                    <h3>Alerts</h3>
+                    <div class="value" id="alertCount">0</div>
+                </div>
+                <div class="card">
+                    <h3>Threats</h3>
+                    <div class="value" id="threatCount">0</div>
+                </div>
+                <div class="card">
+                    <h3>Attack Rate</h3>
+                    <div class="value" id="attackRate">0%</div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h3>Latest alerts</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Source</th>
+                            <th>Destination</th>
+                            <th>Protocol</th>
+                            <th>Prediction</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alertTable"></tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        async function loadSummary() {
+            const response = await fetch('/ai_detection_summary');
+            const summary = await response.json();
+
+            document.getElementById('totalPackets').textContent = summary.total_packets;
+            document.getElementById('safeCount').textContent = summary.safe_count;
+            document.getElementById('alertCount').textContent = summary.alert_count;
+            document.getElementById('threatCount').textContent = summary.threat_count;
+            document.getElementById('attackRate').textContent = summary.attack_rate + '%';
+
+            const table = document.getElementById('alertTable');
+            if (!summary.latest_alerts.length) {
+                table.innerHTML = '<tr><td colspan="5">No suspicious traffic yet.</td></tr>';
+                return;
+            }
+
+            table.innerHTML = summary.latest_alerts.map(entry => {
+                const statusClass = entry.status === 'THREAT' ? 'threat' : 'alert';
+                return `
+                    <tr>
+                        <td>${entry.src}</td>
+                        <td>${entry.dst}</td>
+                        <td>${entry.protocol}</td>
+                        <td>${entry.prediction}</td>
+                        <td><span class="badge ${statusClass}">${entry.status}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        setInterval(loadSummary, 2000);
+        loadSummary();
+    </script>
+</body>
+
+</html>

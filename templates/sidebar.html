@@ -1,0 +1,220 @@
+<style>
+    /* ================= MASTER UNIFIED DASHBOARD SIDEBAR ================= */
+    .sidebar {
+        width: 255px !important;
+        height: 100vh !important;
+        background: linear-gradient(180deg, #0b1726 0%, #07111d 100%) !important;
+        border-right: 1px solid #183047 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        flex-shrink: 0 !important;
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        z-index: 1000 !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .sidebar .logo {
+        height: 85px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 27px !important;
+        font-weight: 800 !important;
+        color: #00d4ff !important;
+        border-bottom: 1px solid #183047 !important;
+        letter-spacing: 1px !important;
+        text-align: center !important;
+        padding: 0 !important;
+    }
+
+    .sidebar .logo span {
+        color: white !important;
+        margin-left: 8px !important;
+        margin-right: 0 !important;
+    }
+
+    .sidebar .system-status {
+        margin: 18px !important;
+        padding: 12px !important;
+        background: #0d2031 !important;
+        border: 1px solid #1b3b53 !important;
+        border-radius: 10px !important;
+        font-size: 12px !important;
+        color: #8fa8ba !important;
+    }
+
+    .sidebar .status-dot {
+        display: inline-block !important;
+        width: 9px !important;
+        height: 9px !important;
+        border-radius: 50% !important;
+        background: #00ff88 !important;
+        margin-right: 7px !important;
+        box-shadow: 0 0 10px #00ff88 !important;
+    }
+
+    .sidebar ul {
+        list-style: none !important;
+        padding: 5px 12px !important;
+        flex: 1 !important;
+        margin: 0 !important;
+    }
+
+    .sidebar li {
+        margin: 5px 0 !important;
+        padding: 0 !important;
+        border-radius: 9px !important;
+        transition: .2s !important;
+        list-style: none !important;
+    }
+
+    .sidebar li a {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        padding: 14px 16px !important;
+        border-radius: 9px !important;
+        cursor: pointer !important;
+        color: #9db2c2 !important;
+        font-size: 14px !important;
+        text-decoration: none !important;
+        transition: .2s !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .sidebar li a:hover, .sidebar li:hover a {
+        background: #10283b !important;
+        color: white !important;
+        transform: translateX(2px) !important;
+    }
+
+    .sidebar li.active a, .sidebar li a.active {
+        background: linear-gradient(90deg, #00d4ff, #0099bb) !important;
+        color: #00131c !important;
+        font-weight: 700 !important;
+        box-shadow: 0 0 18px rgba(0, 212, 255, .25) !important;
+    }
+
+    .sidebar-bottom {
+        padding: 15px !important;
+        border-top: 1px solid #183047 !important;
+        margin-top: auto !important;
+    }
+
+    .user-mini {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+    }
+
+    .avatar {
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 50% !important;
+        background: linear-gradient(135deg, #00d4ff, #0066ff) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: white !important;
+        font-weight: bold !important;
+    }
+
+    .user-info small {
+        display: block !important;
+        color: #6f8798 !important;
+        font-size: 11px !important;
+    }
+</style>
+
+<div class="sidebar">
+
+    <div class="logo">
+        🛡 <span>NIDS</span>
+    </div>
+
+    <div class="system-status">
+        <span class="status-dot"></span>
+        SYSTEM PROTECTED
+        <div style="margin-top:5px;color:#506879;">
+            AI Monitoring Active
+        </div>
+    </div>
+
+    <ul>
+        <li class="{% if active_page == 'dashboard' %}active{% endif %}">
+            <a href="{{ url_for('dashboard') }}" class="{% if active_page == 'dashboard' %}active{% endif %}">
+                🏠 <span>Dashboard</span>
+            </a>
+        </li>
+
+        <li class="{% if active_page == 'live_capture' %}active{% endif %}">
+            <a href="{{ url_for('live_capture') }}" class="{% if active_page == 'live_capture' %}active{% endif %}">
+                📡 <span>Live Capture</span>
+            </a>
+        </li>
+
+        <li class="{% if active_page == 'ai_detection' %}active{% endif %}">
+            <a href="{{ url_for('ai_detection') }}" class="{% if active_page == 'ai_detection' %}active{% endif %}">
+                🤖 <span>AI Detection</span>
+            </a>
+        </li>
+
+        <li class="{% if active_page == 'logs' %}active{% endif %}">
+            <a href="{{ url_for('logs') }}" class="{% if active_page == 'logs' %}active{% endif %}">
+                📜 <span>Logs</span>
+            </a>
+        </li>
+
+        <li class="{% if active_page == 'analytics' %}active{% endif %}">
+            <a href="{{ url_for('analytics') }}" class="{% if active_page == 'analytics' %}active{% endif %}">
+                📊 <span>Analytics</span>
+            </a>
+        </li>
+
+        <li class="{% if active_page == 'network_devices' %}active{% endif %}">
+            <a href="{{ url_for('network_devices') }}" class="{% if active_page == 'network_devices' %}active{% endif %}">
+                🌐 <span>Network Devices</span>
+            </a>
+        </li>
+
+        <li class="{% if active_page == 'profile' %}active{% endif %}">
+            <a href="{{ url_for('profile') }}" class="{% if active_page == 'profile' %}active{% endif %}">
+                👤 <span>Profile</span>
+            </a>
+        </li>
+
+        <li class="{% if active_page == 'reports' %}active{% endif %}">
+            <a href="{{ url_for('reports') }}" class="{% if active_page == 'reports' %}active{% endif %}">
+                📈 <span>Reports</span>
+            </a>
+        </li>
+
+        <li class="{% if active_page == 'settings' %}active{% endif %}">
+            <a href="{{ url_for('settings') }}" class="{% if active_page == 'settings' %}active{% endif %}">
+                ⚙ <span>Settings</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="sidebar-bottom">
+        <div class="user-mini">
+            <div class="avatar">
+                {{ session.get('username','U')[0]|upper }}
+            </div>
+            <div class="user-info">
+                <strong style="color:white;display:block;">
+                    {{ session.get('username','User') }}
+                </strong>
+                <small>
+                    Security Administrator
+                </small>
+            </div>
+        </div>
+    </div>
+
+</div>

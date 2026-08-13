@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Face Verification - AI NIDS</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background:
+                radial-gradient(circle at top, #123047, transparent 45%),
+                #07111d;
+            color: white;
+        }
+
+        .container {
+            width: 460px;
+            padding: 30px;
+            background: #0d1b2a;
+            border: 1px solid #19354a;
+            border-radius: 18px;
+            box-shadow: 0 0 35px rgba(0, 212, 255, 0.12);
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            color: #00d4ff;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #7891a3;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        .camera-box {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background: #050b12;
+            border: 2px solid #19354a;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .face-frame {
+            position: absolute;
+            width: 180px;
+            height: 220px;
+            border: 2px solid #00d4ff;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow:
+                0 0 15px rgba(0, 212, 255, .3),
+                inset 0 0 15px rgba(0, 212, 255, .08);
+            pointer-events: none;
+        }
+
+        .status {
+            min-height: 22px;
+            color: #ffc107;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+
+        .verify-btn {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 9px;
+            background: #00d4ff;
+            color: #00131c;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .verify-btn:hover {
+            background: #00aacc;
+        }
+
+        .verify-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .back {
+            margin-top: 18px;
+        }
+
+        .back a {
+            color: #38bdf8;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .back a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #ff5252;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="logo">
+        🛡 AI NIDS
+    </div>
+
+    <div class="subtitle">
+        Identity Verification
+    </div>
+
+    {% if error %}
+        <div class="error">
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <div class="camera-box">
+
+        <video id="video" autoplay playsinline></video>
+
+        <div class="face-frame"></div>
+
+    </div>
+
+    <div class="status" id="status">
+        Starting camera...
+    </div>
+
+    <button
+        class="verify-btn"
+        id="verifyBtn"
+        disabled
+        onclick="captureFace()"
+    >
+        Verify Face
+    </button>
+
+    <div class="back">
+        <a href="{{ url_for('forgot_password') }}">
+            ← Back to Forgot Password
+        </a>
+    </div>
+
+</div>
+
+
+<script>
+
+const video = document.getElementById("video");
+const statusText = document.getElementById("status");
+const verifyBtn = document.getElementById("verifyBtn");
+
+let stream = null;
+
+
+async function startCamera() {
+
+    try {
+
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: "user"
+            },
+            audio: false
+        });
+
+        video.srcObject = stream;
+
+        statusText.innerText =
+            "Camera ready. Position your face inside the frame.";
+
+        statusText.style.color = "#00ff88";
+
+        verifyBtn.disabled = false;
+
+    } catch (error) {
+
+        console.error(error);
+
+        statusText.innerText =
+            "Unable to access camera. Please allow camera permission.";
+
+        statusText.style.color = "#ff5252";
+
+    }
+
+}
+
+
+function captureFace() {
+
+    if (!video.videoWidth || !video.videoHeight) {
+
+        statusText.innerText =
+            "Camera is not ready yet.";
+
+        return;
+    }
+
+    verifyBtn.disabled = true;
+
+    statusText.innerText =
+        "Capturing face...";
+
+    statusText.style.color = "#ffc107";
+
+
+    const canvas = document.createElement("canvas");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const context = canvas.getContext("2d");
+
+    context.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    const imageData =
+        canvas.toDataURL("image/jpeg", 0.85);
+
+
+    fetch("/verify_face", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            image: imageData
+        })
+
+    })
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        if (data.success) {
+
+            statusText.innerText =
+                "Face verified successfully.";
+
+            statusText.style.color =
+                "#00ff88";
+
+            setTimeout(() => {
+
+                window.location.href =
+                    data.redirect;
+
+            }, 700);
+
+        } else {
+
+            statusText.innerText =
+                data.message || "Face verification failed.";
+
+            statusText.style.color =
+                "#ff5252";
+
+            verifyBtn.disabled = false;
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+        statusText.innerText =
+            "Verification request failed.";
+
+        statusText.style.color =
+            "#ff5252";
+
+        verifyBtn.disabled = false;
+
+    });
+
+}
+
+
+window.addEventListener(
+    "beforeunload",
+    function () {
+
+        if (stream) {
+
+            stream.getTracks().forEach(
+                track => track.stop()
+            );
+
+        }
+
+    }
+);
+
+
+startCamera();
+
+</script>
+
+</body>
+</html>

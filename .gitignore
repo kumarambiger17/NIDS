@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Secrets
+.env
+*.env
+
+# Databases
+users.db
+users_local.db
+*.db
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python build files
+build/
+dist/
+*.spec
+
+# Logs
+*.log
+
+# Large datasets
+dataset/
+
+# Generated installers/build output
+Output/
+Installer/
+NIDS_setup.iss

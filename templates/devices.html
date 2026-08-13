@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Network Devices - AI NIDS</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    body {
+      background: #0f172a;
+      color: white;
+    }
+
+    .header {
+      height: 70px;
+      background: #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 30px;
+      box-shadow: 0 0 15px rgba(0, 255, 255, .15);
+    }
+
+    .header h2 {
+      color: #38bdf8;
+    }
+
+    .container {
+      padding: 30px;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 0 15px rgba(0, 255, 255, .15);
+      transition: .3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h3 {
+      font-size: 16px;
+      color: #cbd5e1;
+      margin-bottom: 15px;
+    }
+
+    .card h1 {
+      font-size: 35px;
+      color: #38bdf8;
+    }
+
+    .search-box {
+      margin-bottom: 20px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #1e293b;
+      color: white;
+      font-size: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1e293b;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th {
+      background: #0ea5e9;
+      padding: 15px;
+      font-size: 15px;
+    }
+
+    td {
+      padding: 14px;
+      text-align: center;
+      border-bottom: 1px solid #334155;
+    }
+
+    tr:hover {
+      background: #273549;
+    }
+
+    .safe {
+      color: #22c55e;
+      font-weight: bold;
+    }
+
+    .alert {
+      color: #facc15;
+      font-weight: bold;
+    }
+
+    .threat {
+      color: #ef4444;
+      font-weight: bold;
+    }
+
+    .online {
+      color: #22c55e;
+    }
+
+    button {
+
+      padding: 8px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #38bdf8;
+      color: white;
+      font-weight: bold;
+
+    }
+
+    button:hover {
+
+      background: #0284c7;
+
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="container"
+    style="display:flex;min-height:100vh;height:100vh;padding:0;background:#0f172a;color:white;overflow:hidden;">
+    {% include 'sidebar.html' %}
+    <div style="flex:1;margin-left:255px;padding:30px;overflow-y:auto;height:100vh;">
+      <div class="header">
+        <h2>🛡 AI NIDS - Network Devices</h2>
+        <div>Logged In</div>
+      </div>
+      <div class="container">
+        <div class="cards">
+          <div class="card">
+            <h3>Total Devices</h3>
+            <h1>{{ total_devices }}</h1>
+          </div>
+          <div class="card">
+            <h3>Online</h3>
+            <h1>{{ online_devices }}</h1>
+          </div>
+          <div class="card">
+            <h3>Suspicious</h3>
+            <h1>{{ suspicious_devices }}</h1>
+          </div>
+        </div>
+        <div class="search-box">
+          <input type="text" id="search" placeholder="Search IP Address..." onkeyup="searchDevice()">
+        </div>
+        <table id="deviceTable">
+          <thead>
+            <tr>
+              <th>Device</th>
+              <th>IP Address</th>
+              <th>Status</th>
+              <th>Packets Sent</th>
+              <th>Packets Received</th>
+              <th>Last Seen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for device in devices %}
+            <tr>
+              <td>{{ device.name }}</td>
+              <td>{{ device.ip }}</td>
+              <td class="online">🟢 Online</td>
+              <td>{{ device.packets_sent }}</td>
+              <td>{{ device.packets_received }}</td>
+              <td>{{ device.last_seen }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script>
+    function searchDevice() {
+      const query = document.getElementById('search').value.toLowerCase();
+      const rows = document.querySelectorAll('#deviceTable tbody tr');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+      });
+    }
+  </script>
+
+</body>
+
+</html>

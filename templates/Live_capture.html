@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Capture - AI NIDS</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #101820;
+            color: white;
+        }
+
+        .header {
+            background: #162536;
+            padding: 20px;
+            text-align: center;
+            color: #00d4ff;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .container {
+            width: 95%;
+            margin: auto;
+            margin-top: 25px;
+        }
+
+        .cards {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            flex: 1;
+            background: #162536;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 212, 255, .3);
+        }
+
+        .card h2 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .buttons {
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .start {
+            background: #28a745;
+            color: white;
+        }
+
+        .stop {
+            background: #dc3545;
+            color: white;
+        }
+
+        .clear {
+            background: #ffc107;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #162536;
+        }
+
+        th {
+            background: #00d4ff;
+            color: black;
+            padding: 12px;
+        }
+
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #2e4053;
+        }
+
+        .safe {
+            color: #00ff66;
+            font-weight: bold;
+        }
+
+        .attack {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div style="display:flex;min-height:100vh;height:100vh;overflow:hidden;background:#101820;color:white;">
+        {% include 'sidebar.html' %}
+        <div style="flex:1;margin-left:255px;overflow-y:auto;height:100vh;">
+            <div class="header">
+                📡 AI NIDS - Live Packet Capture
+            </div>
+
+            <div class="container">
+
+                <div class="cards">
+
+                    <div class="card">
+                        <h2>Packets</h2>
+                        <p id="packetCount">0</p>
+                    </div>
+
+                    <div class="card">
+                        <h2>Status</h2>
+                        <p style="color:#00ff66;">Running</p>
+                    </div>
+
+                    <div class="card">
+                        <h2>Threats</h2>
+                        <p id="threatCount">0</p>
+                    </div>
+
+                </div>
+
+                <div class="buttons">
+
+                    <button class="start">
+                        Start Capture
+                    </button>
+
+                    <button class="stop">
+                        Stop Capture
+                    </button>
+
+                    <button class="clear" onclick="clearTable()">
+                        Clear
+                    </button>
+
+                </div>
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Source IP</th>
+
+                            <th>Destination IP</th>
+
+                            <th>Protocol</th>
+
+                            <th>Length</th>
+
+                            <th>Prediction</th>
+
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="packetTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+        <script>
+
+            async function loadPackets() {
+
+                const response = await fetch("/packets");
+
+                const packets = await response.json();
+
+                const table = document.getElementById("packetTable");
+
+                table.innerHTML = "";
+
+                let threats = 0;
+
+                packets.forEach(packet => {
+
+                    if (packet.status != "SAFE")
+                        threats++;
+
+                    table.innerHTML += `
+
+<tr>
+
+<td>${packet.src}</td>
+
+<td>${packet.dst}</td>
+
+<td>${packet.protocol}</td>
+
+<td>${packet.length}</td>
+
+<td>${packet.prediction}</td>
+
+<td class="${packet.status == "SAFE" ? "safe" : "attack"}">
+
+${packet.status}
+
+</td>
+
+</tr>
+
+`;
+
+                });
+
+                document.getElementById("packetCount").innerText = packets.length;
+
+                document.getElementById("threatCount").innerText = threats;
+
+            }
+
+            function clearTable() {
+
+                document.getElementById("packetTable").innerHTML = "";
+
+                document.getElementById("packetCount").innerText = "0";
+
+                document.getElementById("threatCount").innerText = "0";
+
+            }
+
+            setInterval(loadPackets, 1000);
+
+            loadPackets();
+
+        </script>
+
+</body>
+
+</html>

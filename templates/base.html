@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}AI NIDS{% endblock %}</title>
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+
+        body {
+            background: #0b1220;
+            color: white;
+        }
+
+
+        /* =========================
+           MAIN CONTAINER
+        ========================= */
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+        }
+
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+
+            width: 250px;
+            height: 100vh;
+
+            background: #0b1320;
+
+            border-right: 1px solid #1e3448;
+
+            position: fixed;
+            left: 0;
+            top: 0;
+
+            overflow: hidden;
+
+            flex-shrink: 0;
+        }
+
+
+        /* =========================
+           LOGO
+        ========================= */
+
+        .logo {
+
+            height: 90px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            color: #00d4ff;
+
+            font-size: 28px;
+
+            font-weight: bold;
+
+            border-bottom: 1px solid #1e3448;
+
+            letter-spacing: 1px;
+        }
+
+
+        /* =========================
+           SIDEBAR MENU
+        ========================= */
+
+        .sidebar-menu {
+
+            padding: 18px 12px;
+        }
+
+
+        .sidebar-menu a {
+
+            display: flex;
+
+            align-items: center;
+
+            width: 100%;
+
+            padding: 14px 16px;
+
+            margin-bottom: 7px;
+
+            text-decoration: none;
+
+            color: #b8c7d9;
+
+            border-radius: 9px;
+
+            font-size: 15px;
+
+            transition: all 0.2s ease;
+
+            cursor: pointer;
+        }
+
+
+        .sidebar-menu a:hover {
+
+            background: #162536;
+
+            color: white;
+
+            transform: translateX(3px);
+        }
+
+
+        /* ACTIVE PAGE */
+
+        .sidebar-menu a.active {
+
+            background: #00d4ff;
+
+            color: #06121c;
+
+            font-weight: bold;
+
+            box-shadow: 0 0 14px rgba(0, 212, 255, 0.35);
+        }
+
+
+        .menu-icon {
+
+            width: 34px;
+
+            font-size: 19px;
+
+            flex-shrink: 0;
+        }
+
+
+        /* =========================
+           MAIN CONTENT
+        ========================= */
+
+        .main {
+
+            margin-left: 255px;
+
+            width: calc(100% - 255px);
+
+            height: 100vh;
+
+            overflow-y: auto;
+
+            padding: 30px;
+        }
+
+
+        /* Scrollbar */
+
+        .main::-webkit-scrollbar {
+
+            width: 8px;
+        }
+
+
+        .main::-webkit-scrollbar-track {
+
+            background: #0b1220;
+        }
+
+
+        .main::-webkit-scrollbar-thumb {
+
+            background: #263c50;
+
+            border-radius: 10px;
+        }
+
+
+        .main::-webkit-scrollbar-thumb:hover {
+
+            background: #00d4ff;
+        }
+
+
+        /* =========================
+           MOBILE / SMALL SCREEN
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+
+                width: 210px;
+            }
+
+
+            .main {
+
+                margin-left: 210px;
+
+                width: calc(100% - 210px);
+
+                padding: 20px;
+            }
+
+        }
+    </style>
+
+
+    {% block extra_css %}{% endblock %}
+
+</head>
+
+
+<body>
+
+
+    <div class="container">
+
+
+        <!-- =========================
+         SIDEBAR
+    ========================= -->
+
+        {% include 'sidebar.html' %}
+
+
+        <!-- =========================
+         PAGE CONTENT
+    ========================= -->
+
+        <div class="main">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </div>
+
+
+    </div>
+
+
+    {% block extra_js %}{% endblock %}
+
+</body>
+
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI NIDS - Profile</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #101820;
+            color: white;
+        }
+
+        .header {
+            background: #162536;
+            padding: 20px;
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+            color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, .4);
+        }
+
+        .container {
+            width: 90%;
+            margin: 30px auto;
+        }
+
+        .profile-card {
+            background: #162536;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, .25);
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: #00d4ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 60px;
+            font-weight: bold;
+            color: black;
+        }
+
+        .info h2 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #00ff88;
+            color: black;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .box {
+            background: #162536;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 212, 255, .2);
+        }
+
+        .box h3 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: #162536;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 212, 255, .2);
+        }
+
+        .stat-card h1 {
+            color: #00d4ff;
+            font-size: 35px;
+            margin-bottom: 10px;
+        }
+
+        .buttons {
+            margin-top: 35px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .buttons button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: .3s;
+        }
+
+        .edit {
+            background: #00d4ff;
+            color: black;
+        }
+
+        .username {
+            background: #ff9800;
+            color: white;
+        }
+
+        .password {
+            background: #9c27b0;
+            color: white;
+        }
+
+        .logout {
+            background: #e53935;
+            color: white;
+        }
+
+        .dashboard {
+            background: #28a745;
+            color: white;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .activity {
+            margin-top: 30px;
+            background: #162536;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 212, 255, .2);
+        }
+
+        .activity ul {
+            margin-top: 15px;
+            padding-left: 20px;
+        }
+
+        .activity li {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display:flex;min-height:100vh;height:100vh;overflow:hidden;background:#101820;color:white;">
+        {% include 'sidebar.html' %}
+        <div style="flex:1;margin-left:255px;overflow-y:auto;height:100vh;">
+            <div class="header">
+                👤 My Profile
+            </div>
+
+            <div class="container">
+
+                <div class="profile-card">
+
+                    <div class="avatar">
+                        {{ session.get('username','U')[0]|upper }}
+                    </div>
+
+                    <div class="info">
+
+                        <h2>{{ user.fullname }}</h2>
+
+                        <p><b>Role :</b> Administrator</p>
+
+                        <p><b>Username :</b> {{ user.username }}</p>
+
+                        <p><b>Email :</b> {{ user.email }}</p>
+
+                        <p><b>Account Status :</b>
+                            <span class="status">ACTIVE</span>
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="details">
+
+                    <div class="box">
+                        <h3>Account Information</h3>
+
+                        <p><b>Full Name :</b> {{ user.fullname }}</p>
+                        <br>
+
+                        <p><b>Username :</b> {{ user.username }}</p>
+                        <br>
+
+                        <p><b>Email :</b> {{ user.email }}</p>
+
+                    </div>
+
+                    <div class="box">
+
+                        <h3>System Information</h3>
+
+                        <p><b>Role :</b> Administrator</p>
+                        <br>
+
+                        <p><b>AI Detection :</b> Enabled</p>
+                        <br>
+
+                        <p><b>Monitoring :</b> Active</p>
+
+                    </div>
+
+                </div>
+
+                <div class="stats">
+
+                    <div class="stat-card">
+                        <h1>145</h1>
+                        <p>Total Logins</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <h1>320</h1>
+                        <p>Threats Detected</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <h1>15824</h1>
+                        <p>Safe Packets</p>
+                    </div>
+
+                    <div class="stat-card">
+                        <h1>98.4%</h1>
+                        <p>AI Accuracy</p>
+                    </div>
+
+                </div>
+
+                <div class="buttons">
+
+                    <a href="/change_username">
+                        <button class="username">
+                            👤 Change Username
+                        </button>
+                    </a>
+
+                    <a href="/change_password">
+                        <button class="password">
+                            🔒 Change Password
+                        </button>
+                    </a>
+
+                    <a href="/settings">
+                        <button class="edit">
+                            ⚙ Settings
+                        </button>
+                    </a>
+
+                    <a href="/dashboard">
+                        <button class="dashboard">
+                            🏠 Dashboard
+                        </button>
+                    </a>
+
+                    <a href="/logout">
+                        <button class="logout">
+                            🚪 Logout
+                        </button>
+                    </a>
+
+                </div>
+
+                <div class="activity">
+
+                    <h2 style="color:#00d4ff;">
+                        Recent Activity
+                    </h2>
+
+                    <ul>
+
+                        <li>✅ Logged into AI NIDS Dashboard</li>
+
+                        <li>🛡 AI Detection Enabled</li>
+
+                        <li>📡 Live Monitoring Started</li>
+
+                        <li>📊 Analytics Viewed</li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+</body>
+
+</html>

@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI NIDS - Security Reports</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            background: #0b1220;
+            color: #e5eef8;
+            overflow: hidden;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: #08111f;
+            border-right: 1px solid #1c3047;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .logo {
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #00d4ff;
+            border-bottom: 1px solid #1c3047;
+        }
+
+        .logo span {
+            margin-right: 8px;
+        }
+
+        .nav {
+            padding: 18px 10px;
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: #d8e6f5;
+            padding: 14px 16px;
+            margin-bottom: 7px;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: .2s;
+        }
+
+        .nav a:hover {
+            background: #10273b;
+            color: #00d4ff;
+        }
+
+        .nav a.active {
+            background: #00c8ee;
+            color: #00131c;
+            font-weight: bold;
+        }
+
+        .nav-icon {
+            width: 25px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 255px;
+            width: calc(100% - 255px);
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 32px;
+        }
+
+        /* ================= HEADER ================= */
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header-left h1 {
+            font-size: 32px;
+            color: #00d4ff;
+            margin-bottom: 7px;
+        }
+
+        .header-left p {
+            color: #8da5bb;
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            border: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #00d4ff;
+            color: #00131c;
+        }
+
+        .btn-primary:hover {
+            background: #00aacc;
+        }
+
+        .btn-secondary {
+            background: #16283c;
+            color: #dcefff;
+            border: 1px solid #29425b;
+        }
+
+        .btn-secondary:hover {
+            border-color: #00d4ff;
+        }
+
+        /* ================= REPORT INFO ================= */
+
+        .report-info {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .info-card {
+            background: #111f30;
+            border: 1px solid #1e354c;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: #00d4ff;
+        }
+
+        .info-title {
+            color: #8da5bb;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .info-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #f2f8ff;
+        }
+
+        .info-sub {
+            margin-top: 7px;
+            font-size: 12px;
+            color: #6f879d;
+        }
+
+        /* ================= GRID ================= */
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: #111f30;
+            border: 1px solid #1e354c;
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            color: #edf7ff;
+        }
+
+        .card-header span {
+            color: #718ba2;
+            font-size: 12px;
+        }
+
+        /* ================= SECURITY SCORE ================= */
+
+        .security-score {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 12px solid #17344b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .score-circle strong {
+            font-size: 38px;
+            color: #00d4ff;
+        }
+
+        .score-circle span {
+            color: #8ba2b7;
+            font-size: 12px;
+        }
+
+        .score-details {
+            flex: 1;
+        }
+
+        .score-details h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .score-details p {
+            color: #8da5bb;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+
+        /* ================= PROGRESS ================= */
+
+        .progress-item {
+            margin-bottom: 18px;
+        }
+
+        .progress-top {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .progress-label {
+            color: #d8e6f5;
+        }
+
+        .progress-value {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        .progress {
+            width: 100%;
+            height: 8px;
+            background: #1a2b3e;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: #00d4ff;
+            border-radius: 10px;
+            transition: width .6s ease;
+        }
+
+        .progress-bar.alert {
+            background: #f5b942;
+        }
+
+        .progress-bar.danger {
+            background: #ff4d67;
+        }
+
+        .progress-bar.safe {
+            background: #00e59b;
+        }
+
+        /* ================= TABLE ================= */
+
+        .table-card {
+            margin-bottom: 30px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+
+        thead {
+            background: #0b1827;
+        }
+
+        th {
+            padding: 14px;
+            text-align: left;
+            color: #00d4ff;
+            font-size: 13px;
+            border-bottom: 1px solid #29425b;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #1b3045;
+            color: #d5e2ee;
+            font-size: 13px;
+        }
+
+        tbody tr:hover {
+            background: #14283c;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .status.safe {
+            background: rgba(0, 229, 155, .12);
+            color: #00e59b;
+        }
+
+        .status.alert {
+            background: rgba(245, 185, 66, .12);
+            color: #f5b942;
+        }
+
+        .status.threat {
+            background: rgba(255, 77, 103, .12);
+            color: #ff4d67;
+        }
+
+        /* ================= FOOTER ================= */
+
+        .report-footer {
+            text-align: center;
+            padding: 20px;
+            color: #60778d;
+            font-size: 12px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media(max-width:1000px) {
+
+            .report-info {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media(max-width:700px) {
+
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+                margin-left: 210px;
+                width: calc(100% - 210px);
+                padding: 20px;
+            }
+
+            .report-info {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    {% include 'sidebar.html' %}
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <div class="header">
+
+            <div class="header-left">
+
+                <h1>Security Reports</h1>
+
+                <p>
+                    AI-powered network security assessment and intrusion detection report
+                </p>
+
+            </div>
+
+            <div class="header-actions">
+
+                <button class="btn btn-secondary" onclick="window.location.reload()">
+                    🔄 Refresh
+                </button>
+
+                <button class="btn btn-primary" onclick="window.print()">
+                    🖨 Generate Report
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= SUMMARY CARDS ================= -->
+
+        <section class="report-info">
+
+            <div class="info-card">
+
+                <div class="info-title">
+                    TOTAL PACKETS
+                </div>
+
+                <div class="info-value" id="totalPackets">
+                    0
+                </div>
+
+                <div class="info-sub">
+                    Packets analyzed
+                </div>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <div class="info-title">
+                    SAFE TRAFFIC
+                </div>
+
+                <div class="info-value" id="safePackets">
+                    0
+                </div>
+
+                <div class="info-sub">
+                    Normal network traffic
+                </div>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <div class="info-title">
+                    ALERTS
+                </div>
+
+                <div class="info-value" id="alertPackets">
+                    0
+                </div>
+
+                <div class="info-sub">
+                    Suspicious activity
+                </div>
+
+            </div>
+
+
+            <div class="info-card">
+
+                <div class="info-title">
+                    THREATS
+                </div>
+
+                <div class="info-value" id="threatPackets">
+                    0
+                </div>
+
+                <div class="info-sub">
+                    Detected threats
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= MAIN REPORT GRID ================= -->
+
+        <section class="grid">
+
+            <!-- SECURITY SCORE -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h2>🛡 Security Assessment</h2>
+
+                    <span>Real-time analysis</span>
+
+                </div>
+
+
+                <div class="security-score">
+
+                    <div class="score-circle">
+
+                        <strong id="securityScore">
+                            100
+                        </strong>
+
+                        <span>SECURITY</span>
+
+                    </div>
+
+
+                    <div class="score-details">
+
+                        <h3 id="securityStatus">
+                            System Secure
+                        </h3>
+
+                        <p id="securityDescription">
+                            The network is currently operating normally.
+                            AI-based packet analysis has not detected significant
+                            malicious activity.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- TRAFFIC DISTRIBUTION -->
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h2>📊 Traffic Distribution</h2>
+
+                    <span>Current session</span>
+
+                </div>
+
+
+                <div class="progress-item">
+
+                    <div class="progress-top">
+
+                        <span class="progress-label">
+                            Safe
+                        </span>
+
+                        <span class="progress-value" id="safePercent">
+                            0%
+                        </span>
+
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-bar safe" id="safeBar"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="progress-item">
+
+                    <div class="progress-top">
+
+                        <span class="progress-label">
+                            Suspicious
+                        </span>
+
+                        <span class="progress-value" id="alertPercent">
+                            0%
+                        </span>
+
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-bar alert" id="alertBar"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="progress-item">
+
+                    <div class="progress-top">
+
+                        <span class="progress-label">
+                            Threats
+                        </span>
+
+                        <span class="progress-value" id="threatPercent">
+                            0%
+                        </span>
+
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-bar danger" id="threatBar"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= LATEST ALERTS ================= -->
+
+        <section class="card table-card">
+
+            <div class="card-header">
+
+                <h2>🚨 Latest Security Events</h2>
+
+                <span>AI detection results</span>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Source IP</th>
+
+                            <th>Destination IP</th>
+
+                            <th>Protocol</th>
+
+                            <th>Packet Length</th>
+
+                            <th>Prediction</th>
+
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="eventsTable">
+
+                        <tr>
+
+                            <td colspan="6" style="text-align:center;color:#718ba2;">
+                                Loading security events...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <div class="report-footer">
+
+            AI NIDS • Network Intrusion Detection System
+            <br>
+            AI-powered network monitoring and security analysis
+
+        </div>
+
+    </main>
+
+
+    <script>
+
+        /* ================= LOAD REPORT DATA ================= */
+
+        async function loadReport() {
+
+            try {
+
+                const response =
+                    await fetch("/ai_detection_summary");
+
+                if (!response.ok) {
+                    throw new Error("Unable to load report");
+                }
+
+                const data =
+                    await response.json();
+
+
+                const total =
+                    Number(data.total_packets || 0);
+
+                const safe =
+                    Number(data.safe_count || 0);
+
+                const alerts =
+                    Number(data.alert_count || 0);
+
+                const threats =
+                    Number(data.threat_count || 0);
+
+
+                document.getElementById("totalPackets").textContent = total;
+
+                document.getElementById("safePackets").textContent = safe;
+
+                document.getElementById("alertPackets").textContent = alerts;
+
+                document.getElementById("threatPackets").textContent = threats;
+
+
+                /* ================= PERCENTAGES ================= */
+
+                let safePercent = 0;
+                let alertPercent = 0;
+                let threatPercent = 0;
+
+                if (total > 0) {
+
+                    safePercent =
+                        Math.round((safe / total) * 100);
+
+                    alertPercent =
+                        Math.round((alerts / total) * 100);
+
+                    threatPercent =
+                        Math.round((threats / total) * 100);
+
+                }
+
+
+                document.getElementById("safePercent").textContent =
+                    safePercent + "%";
+
+                document.getElementById("alertPercent").textContent =
+                    alertPercent + "%";
+
+                document.getElementById("threatPercent").textContent =
+                    threatPercent + "%";
+
+
+                document.getElementById("safeBar").style.width =
+                    safePercent + "%";
+
+                document.getElementById("alertBar").style.width =
+                    alertPercent + "%";
+
+                document.getElementById("threatBar").style.width =
+                    threatPercent + "%";
+
+
+                /* ================= SECURITY SCORE ================= */
+
+                let score = 100;
+
+                if (total > 0) {
+
+                    score =
+                        Math.round(
+                            ((safe / total) * 100)
+                        );
+
+                }
+
+                document.getElementById("securityScore").textContent =
+                    score;
+
+
+                const status =
+                    document.getElementById("securityStatus");
+
+                const description =
+                    document.getElementById("securityDescription");
+
+
+                if (threats > 0) {
+
+                    status.textContent =
+                        "Critical Threats Detected";
+
+                    description.textContent =
+                        "The AI detection engine has identified potential threats. Immediate investigation is recommended.";
+
+                }
+                else if (alerts > 0) {
+
+                    status.textContent =
+                        "Suspicious Activity Detected";
+
+                    description.textContent =
+                        "Some network traffic has been classified as suspicious. Review the latest security events.";
+
+                }
+                else {
+
+                    status.textContent =
+                        "System Secure";
+
+                    description.textContent =
+                        "The network is currently operating normally. No significant malicious activity has been detected.";
+
+                }
+
+
+                /* ================= EVENTS ================= */
+
+                const table =
+                    document.getElementById("eventsTable");
+
+                const events =
+                    data.latest_alerts || [];
+
+
+                if (events.length === 0) {
+
+                    table.innerHTML = `
+                <tr>
+                    <td colspan="6"
+                        style="text-align:center;color:#00e59b;">
+                        ✓ No suspicious security events detected
+                    </td>
+                </tr>
+            `;
+
+                    return;
+
+                }
+
+
+                table.innerHTML = "";
+
+
+                events.forEach(event => {
+
+                    const statusValue =
+                        String(event.status || "SAFE").toUpperCase();
+
+                    let statusClass = "safe";
+
+                    if (statusValue === "ALERT") {
+                        statusClass = "alert";
+                    }
+
+                    if (statusValue === "THREAT") {
+                        statusClass = "threat";
+                    }
+
+
+                    const row =
+                        document.createElement("tr");
+
+
+                    row.innerHTML = `
+
+                <td>${event.src || "-"}</td>
+
+                <td>${event.dst || "-"}</td>
+
+                <td>${event.protocol || "-"}</td>
+
+                <td>${event.length || 0}</td>
+
+                <td>${event.prediction || "BENIGN"}</td>
+
+                <td>
+                    <span class="status ${statusClass}">
+                        ${statusValue}
+                    </span>
+                </td>
+
+            `;
+
+
+                    table.appendChild(row);
+
+                });
+
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Report loading error:",
+                    error
+                );
+
+                document.getElementById("eventsTable").innerHTML = `
+
+            <tr>
+
+                <td colspan="6"
+                    style="text-align:center;color:#f5b942;">
+
+                    ⚠ Unable to load live report data
+
+                </td>
+
+            </tr>
+
+        `;
+
+            }
+
+        }
+
+
+        /* Load when page opens */
+
+        loadReport();
+
+
+        /* Refresh report every 5 seconds */
+
+        setInterval(
+            loadReport,
+            5000
+        );
+
+    </script>
+
+</body>
+
+</html>

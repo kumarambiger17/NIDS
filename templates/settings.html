@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI NIDS Settings</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #101820;
+            color: white;
+        }
+
+        .header {
+            background: #162536;
+            padding: 20px;
+            text-align: center;
+            font-size: 30px;
+            color: #00d4ff;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0, 212, 255, .4);
+        }
+
+        .container {
+            width: 75%;
+            margin: 30px auto;
+            background: #162536;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 212, 255, .3);
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #00d4ff;
+        }
+
+        .setting {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 18px 0;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #333;
+        }
+
+        .setting label {
+            font-size: 18px;
+        }
+
+        select {
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 16px;
+            background: #0f172a;
+            color: white;
+            border: 1px solid #2d4158;
+        }
+
+        input[type="checkbox"] {
+            transform: scale(1.4);
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 17px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .save {
+            background: #00d4ff;
+            color: black;
+        }
+
+        .save:hover {
+            background: #00a8cc;
+        }
+
+        .back {
+            background: #28a745;
+            color: white;
+            margin-left: 10px;
+        }
+
+        .back:hover {
+            background: #1d7f35;
+        }
+
+        .message {
+            margin-top: 12px;
+            color: #00ff88;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display:flex;min-height:100vh;height:100vh;overflow:hidden;background:#101820;color:white;">
+        {% include 'sidebar.html' %}
+        <div style="flex:1;margin-left:255px;overflow-y:auto;height:100vh;">
+            <div class="header">⚙ AI NIDS Settings</div>
+            <div class="container">
+                <h2>General Settings</h2>
+                <form method="POST" action="/settings">
+                    <div class="setting">
+                        <label>Dark Mode</label>
+                        <input type="checkbox" name="dark_mode" {% if settings and settings.dark_mode %}checked{% endif
+                            %}>
+                    </div>
+                    <div class="setting">
+                        <label>Auto Start Monitoring</label>
+                        <input type="checkbox" name="auto_start_monitoring" {% if settings and
+                            settings.auto_start_monitoring %}checked{% endif %}>
+                    </div>
+                    <h2>Network Settings</h2>
+                    <div class="setting">
+                        <label>Network Interface</label>
+                        <select name="network_interface">
+                            <option {% if settings and settings.network_interface=='Wi-Fi' %}selected{% endif %}>Wi-Fi
+                            </option>
+                            <option {% if settings and settings.network_interface=='Ethernet' %}selected{% endif %}>
+                                Ethernet</option>
+                            <option {% if settings and settings.network_interface=='All Interfaces' %}selected{% endif
+                                %}>All Interfaces</option>
+                        </select>
+                    </div>
+                    <div class="setting">
+                        <label>Capture Filter</label>
+                        <select name="capture_filter">
+                            <option {% if settings and settings.capture_filter=='All' %}selected{% endif %}>All</option>
+                            <option {% if settings and settings.capture_filter=='TCP' %}selected{% endif %}>TCP</option>
+                            <option {% if settings and settings.capture_filter=='UDP' %}selected{% endif %}>UDP</option>
+                            <option {% if settings and settings.capture_filter=='ICMP' %}selected{% endif %}>ICMP
+                            </option>
+                        </select>
+                    </div>
+                    <hr style="margin:30px 0;border:1px solid #333;">
+
+                    <h2>Account Settings</h2>
+
+                    <div style="margin-top:20px;">
+
+                        <a href="/change_username">
+                            <button type="button" style="background:#ff9800;color:white;">
+                                👤 Change Username
+                            </button>
+                        </a>
+
+                        <a href="/change_password">
+                            <button type="button" style="background:#9c27b0;color:white;">
+                                🔒 Change Password
+                            </button>
+                        </a>
+
+                        <a href="/logout">
+                            <button type="button" style="background:#40a1e2;color:white;">
+                                🚪 Logout
+                            </button>
+                        </a>
+
+                    </div>
+                    <h2>AI Detection</h2>
+                    <div class="setting">
+                        <label>Enable AI Detection</label>
+                        <input type="checkbox" name="ai_detection" {% if settings and settings.ai_detection %}checked{%
+                            endif %}>
+                    </div>
+                    <div class="setting">
+                        <label>Detection Sensitivity</label>
+                        <select name="detection_sensitivity">
+                            <option {% if settings and settings.detection_sensitivity=='Low' %}selected{% endif %}>Low
+                            </option>
+                            <option {% if settings and settings.detection_sensitivity=='Medium' %}selected{% endif %}>
+                                Medium</option>
+                            <option {% if settings and settings.detection_sensitivity=='High' %}selected{% endif %}>High
+                            </option>
+                        </select>
+                    </div>
+                    <h2>Alerts</h2>
+                    <div class="setting">
+                        <label>Desktop Notification</label>
+                        <input type="checkbox" name="desktop_notification" {% if settings and
+                            settings.desktop_notification %}checked{% endif %}>
+                    </div>
+                    <div class="setting">
+                        <label>Sound Alert</label>
+                        <input type="checkbox" name="sound_alert" {% if settings and settings.sound_alert %}checked{%
+                            endif %}>
+                    </div>
+                    <div class="setting">
+                        <label>Email Alerts</label>
+                        <input type="checkbox" name="email_alerts" {% if settings and settings.email_alerts %}checked{%
+                            endif %}>
+                    </div>
+                    <h2>Dashboard</h2>
+                    <div class="setting">
+                        <label>Refresh Interval</label>
+                        <select name="refresh_interval">
+                            <option {% if settings and settings.refresh_interval=='1 Second' %}selected{% endif %}>1
+                                Second</option>
+                            <option {% if settings and settings.refresh_interval=='3 Seconds' %}selected{% endif %}>3
+                                Seconds</option>
+                            <option {% if settings and settings.refresh_interval=='5 Seconds' %}selected{% endif %}>5
+                                Seconds</option>
+                            <option {% if settings and settings.refresh_interval=='10 Seconds' %}selected{% endif %}>10
+                                Seconds</option>
+                        </select>
+                    </div>
+                    <button class="save" type="submit">💾 Save Settings</button>
+                    <a href="/dashboard"><button class="back" type="button">⬅ Dashboard</button></a>
+                    {% if message %}<p class="message">{{ message }}</p>{% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
