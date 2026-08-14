@@ -3,3 +3,4 @@ Flask-Mail>=0.9.1
 scapy>=2.5.0
 twilio>=9.0.0
 gunicorn>=21.2.0
+opencv-python-headless>=4.10.0
