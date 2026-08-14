@@ -2,3 +2,4 @@ Flask>=3.0.0
 Flask-Mail>=0.9.1
 scapy>=2.5.0
 twilio>=9.0.0
+gunicorn>=21.2.0
