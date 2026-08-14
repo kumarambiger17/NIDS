@@ -443,11 +443,6 @@ def verify_face():
 @app.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
 
-    # YOUR EXISTING FORGOT PASSWORD CODE GOES HERE
-    
-@app.route("/forgot_password", methods=["GET", "POST"])
-def forgot_password():
-
     if request.method == "POST":
 
         recovery_type = request.form.get("recovery_type", "email")
